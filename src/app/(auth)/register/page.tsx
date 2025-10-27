@@ -20,8 +20,6 @@ export default function RegisterPage() {
     confirmPassword: '',
     role: 'employee',
     department: '',
-    designation: '',
-    office_location: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -60,15 +58,13 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Call backend API - only send fields backend expects
+      // ✅ FIXED: Use full_name instead of name, removed designation and office_location
       const response = await authAPI.register({
         email: formData.email,
         password: formData.password,
-        name: formData.name,
+        full_name: formData.name,  // ✅ Changed from 'name' to 'full_name'
         role: formData.role,
         department: formData.department || undefined,
-        designation: formData.designation || undefined,
-        office_location: formData.office_location || undefined,
       });
       
       console.log('Registration response:', response.data);
@@ -269,30 +265,12 @@ export default function RegisterPage() {
                   </div>
                 </motion.div>
 
-                {/* Designation and Department Row */}
+                {/* Department and Role Row */}
                 <div className="grid grid-cols-2 gap-4">
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 }}
-                  >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Designation
-                    </label>
-                    <input
-                      type="text"
-                      name="designation"
-                      value={formData.designation}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50"
-                      placeholder="Software Engineer"
-                    />
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 }}
                   >
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Department
@@ -311,38 +289,37 @@ export default function RegisterPage() {
                       <option value="finance">Finance</option>
                     </select>
                   </motion.div>
-                </div>
 
-                {/* Role */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Role
-                  </label>
-                  <div className="relative">
-                    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <select
-                      name="role"
-                      value={formData.role}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
-                      required
-                    >
-                      <option value="employee">Employee</option>
-                      <option value="manager">Manager</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                </motion.div>
+                  {/* Role */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Role
+                    </label>
+                    <div className="relative">
+                      <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
+                        required
+                      >
+                        <option value="employee">Employee</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+                  </motion.div>
+                </div>
 
                 {/* Password */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
+                  transition={{ delay: 0.8 }}
                 >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Password
@@ -372,7 +349,7 @@ export default function RegisterPage() {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1.0 }}
+                  transition={{ delay: 0.9 }}
                 >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Confirm Password
@@ -402,7 +379,7 @@ export default function RegisterPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.1 }}
+                  transition={{ delay: 1.0 }}
                   className="pt-4"
                 >
                   <AnimatedButton
@@ -419,7 +396,7 @@ export default function RegisterPage() {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 1.2 }}
+                  transition={{ delay: 1.1 }}
                   className="text-center text-sm text-gray-600"
                 >
                   Already have an account?{' '}

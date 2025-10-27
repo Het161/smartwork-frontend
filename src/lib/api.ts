@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://sih-backend-7qdk.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -80,9 +80,9 @@ export const authAPI = {
   register: (data: {
     email: string;
     password: string;
-    name: string;
+    full_name: string;  // ✅ Changed from 'name' to 'full_name'
     role: string;
-    department: string;
+    department?: string;  // ✅ Made optional
   }) => api.post('/api/v1/auth/register', data),
   
   login: (email: string, password: string) =>
@@ -124,6 +124,17 @@ export const dashboardAPI = {
   getEmployeeStats: () => api.get('/api/v1/dashboard/employee'),
 };
 
+// ✅ UPDATED: Analytics API endpoints with getAdminDashboard
+export const analyticsAPI = {
+  getDashboardData: () => api.get('/api/v1/analytics/dashboard'),
+  getTaskStats: () => api.get('/api/v1/analytics/tasks'),
+  getProductivityTrends: () => api.get('/api/v1/analytics/productivity'),
+  getDepartmentStats: () => api.get('/api/v1/analytics/departments'),
+  getUserAnalytics: (userId: number) => api.get(`/api/v1/analytics/users/${userId}`),
+  getAdminDashboard: () => api.get('/api/v1/dashboard/admin'),  // ✅ ADDED THIS
+};
+
+
 // Notifications API endpoints
 export const notificationsAPI = {
   getAll: () => api.get('/api/v1/notifications'),
@@ -146,4 +157,5 @@ export const chatbotAPI = {
 };
 
 export default api;
+
 
