@@ -6,9 +6,9 @@ const nextConfig = {
   },
   
   // Disable ESLint during build
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
   
   // API rewrites for development
   rewrites: async () => {

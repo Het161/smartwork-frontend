@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json.schemastore.org/package",
   "name": "sih-frontend",
   "version": "1.0.0",
   "scripts": {
@@ -10,18 +11,22 @@
     "axios": "^1.12.2",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.546.0",
-    "next": "^13.5.11",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
     "recharts": "^3.3.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.16",
     "@types/node": "^20.19.23",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8.50.0",
     "eslint-config-next": "^14.0.0",
-    "typescript": "^5.2.0"
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3"
   }
 }
