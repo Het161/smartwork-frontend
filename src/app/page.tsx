@@ -2,17 +2,23 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Sparkles, ArrowRight, Zap, Shield, BarChart3, Users, Cpu, Rocket } from 'lucide-react';
 import { Card3D, FloatingElement, ScalePop, TypewriterText } from '@/components/animations/EnhancedAnimations';
 
 export default function HomePage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
       
-      {/* Animated Background Particles */}
-      {[...Array(20)].map((_, i) => (
+      {/* Animated Background Particles - Only render on client */}
+      {mounted && [...Array(20)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute w-2 h-2 bg-blue-400 rounded-full opacity-30"
@@ -180,3 +186,4 @@ export default function HomePage() {
     </div>
   );
 }
+

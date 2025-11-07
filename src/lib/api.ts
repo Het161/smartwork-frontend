@@ -3,10 +3,12 @@ import toast from 'react-hot-toast';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://sih-backend-7qdk.onrender.com',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
+  withCredentials: false,
 });
 
 // Request interceptor to add JWT token
@@ -15,7 +17,6 @@ api.interceptors.request.use(
     const token = localStorage.getItem('access_token');
     
     if (token) {
-      // Decode token to check expiry (optional but recommended)
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const isExpired = payload.exp * 1000 < Date.now();
@@ -46,7 +47,6 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response) {
       const status = error.response.status;
-      const data: any = error.response.data;
       
       switch (status) {
         case 401:
@@ -61,14 +61,23 @@ api.interceptors.response.use(
         case 404:
           toast.error('Resource not found.');
           break;
+        case 405:
+          toast.error('Method not allowed. Check API endpoint.');
+          break;
+        case 422:
+          toast.error('Validation error. Check input data.');
+          break;
         case 500:
           toast.error('Server error. Please try again later.');
           break;
         default:
+          const data: any = error.response.data;
           toast.error(data?.detail || 'An error occurred.');
       }
     } else if (error.request) {
       toast.error('Network error. Check your connection.');
+    } else {
+      toast.error('An error occurred.');
     }
     
     return Promise.reject(error);
@@ -80,80 +89,86 @@ export const authAPI = {
   register: (data: {
     email: string;
     password: string;
-    full_name: string;  // ✅ Changed from 'name' to 'full_name'
+    full_name: string;
     role: string;
-    department?: string;  // ✅ Made optional
+    department?: string;
   }) => api.post('/api/v1/auth/register', data),
   
-  login: (email: string, password: string) =>
-    api.post('/api/v1/auth/login', new URLSearchParams({
-      username: email,
-      password: password,
-    }), {
+  login: (email: string, password: string) => {
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+    
+    return api.post('/api/v1/auth/login', formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-    }),
+    });
+  },
   
   getCurrentUser: () => api.get('/api/v1/auth/me'),
 };
 
 // Tasks API endpoints
 export const tasksAPI = {
-  getAll: () => api.get('/api/v1/tasks'),
-  getById: (id: number) => api.get(`/api/v1/tasks/${id}`),
+  getAll: (skip: number = 0, limit: number = 100) => 
+    api.get('/api/v1/tasks', {
+      params: { skip, limit }
+    }),
+  
+  getById: (id: number) => 
+    api.get(`/api/v1/tasks/${id}`),
+  
   create: (data: {
     title: string;
-    description: string;
+    description?: string;
     priority: string;
-    due_date: string;
+    due_date?: string;
     assigned_to?: number;
-  }) => api.post('/api/v1/tasks', data),
+  }) => {
+    const payload: any = {
+      title: data.title.trim(),
+      priority: data.priority || 'medium',
+      status: 'pending',
+    };
+    
+    if (data.description && data.description.trim()) {
+      payload.description = data.description.trim();
+    }
+    
+    if (data.due_date) {
+      payload.due_date = new Date(data.due_date).toISOString();
+    }
+    
+    if (data.assigned_to) {
+      payload.assigned_to = data.assigned_to;
+    }
+    
+    console.log('Creating task with payload:', payload);
+    
+    return api.post('/api/v1/tasks', payload);
+  },
   
-  update: (id: number, data: any) => api.put(`/api/v1/tasks/${id}`, data),
-  delete: (id: number) => api.delete(`/api/v1/tasks/${id}`),
+  update: (id: number, data: any) => 
+    api.put(`/api/v1/tasks/${id}`, data),
+  
+  delete: (id: number) => 
+    api.delete(`/api/v1/tasks/${id}`),
+  
   updateStatus: (id: number, status: string) => 
     api.patch(`/api/v1/tasks/${id}/status`, { status }),
 };
 
-// Dashboard API endpoints
-export const dashboardAPI = {
-  getStats: () => api.get('/api/v1/dashboard/stats'),
-  getAdminStats: () => api.get('/api/v1/dashboard/admin'),
-  getManagerStats: () => api.get('/api/v1/dashboard/manager'),
-  getEmployeeStats: () => api.get('/api/v1/dashboard/employee'),
-};
-
-// ✅ UPDATED: Analytics API endpoints with getAdminDashboard
+// Analytics API endpoints
 export const analyticsAPI = {
-  getDashboardData: () => api.get('/api/v1/analytics/dashboard'),
-  getTaskStats: () => api.get('/api/v1/analytics/tasks'),
-  getProductivityTrends: () => api.get('/api/v1/analytics/productivity'),
-  getDepartmentStats: () => api.get('/api/v1/analytics/departments'),
-  getUserAnalytics: (userId: number) => api.get(`/api/v1/analytics/users/${userId}`),
-  getAdminDashboard: () => api.get('/api/v1/dashboard/admin'),  // ✅ ADDED THIS
+  getAdminDashboard: () => api.get('/api/v1/dashboard/admin'),
 };
-
 
 // Notifications API endpoints
 export const notificationsAPI = {
   getAll: () => api.get('/api/v1/notifications'),
   markAsRead: (id: number) => api.patch(`/api/v1/notifications/${id}/read`),
   delete: (id: number) => api.delete(`/api/v1/notifications/${id}`),
-};
-
-// Users API endpoints
-export const usersAPI = {
-  getAll: () => api.get('/api/v1/users'),
-  getById: (id: number) => api.get(`/api/v1/users/${id}`),
-  update: (id: number, data: any) => api.put(`/api/v1/users/${id}`, data),
-  delete: (id: number) => api.delete(`/api/v1/users/${id}`),
-};
-
-// Chatbot API endpoint
-export const chatbotAPI = {
-  sendMessage: (message: string) => 
-    api.post('/api/v1/chatbot', { message }),
 };
 
 export default api;

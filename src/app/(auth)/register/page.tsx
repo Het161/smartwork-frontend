@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, User, Building2, Briefcase, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, User, Building2, Eye, EyeOff } from 'lucide-react';
 import { AnimatedButton } from '@/components/animations/AnimatedButton';
 import { authAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -58,26 +58,53 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // ✅ FIXED: Use full_name instead of name, removed designation and office_location
+      console.log('📤 Sending registration request...');
+      
+      // ✅ FIXED: Send correct payload to backend
       const response = await authAPI.register({
         email: formData.email,
         password: formData.password,
-        full_name: formData.name,  // ✅ Changed from 'name' to 'full_name'
+        full_name: formData.name,  // ✅ Maps 'name' to 'full_name'
         role: formData.role,
         department: formData.department || undefined,
       });
       
-      console.log('Registration response:', response.data);
-      toast.success('Registration successful! Please login.');
+      console.log('✅ Registration successful:', response.data);
       
-      // Redirect to login after 1 second
+      // ✅ FIXED: Save token and user to localStorage
+      const { access_token, user } = response.data;
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      toast.success('Registration successful! Redirecting...');
+      
+      // Redirect to dashboard after 1 second
       setTimeout(() => {
-        router.push('/login');
+        router.push('/dashboard/admin');
       }, 1000);
       
     } catch (error: any) {
-      console.error('Registration error:', error);
-      // Error is already handled by axios interceptor
+      console.error('❌ Registration error:', error);
+      
+      // ✅ FIXED: Better error handling
+      if (error.response?.data?.detail) {
+        // Single error message
+        toast.error(error.response.data.detail);
+      } else if (error.response?.data?.error?.details) {
+        // Validation errors
+        const details = error.response.data.error.details;
+        const errorMsg = details
+          .map((d: any) => `${d.loc.join('.')}: ${d.msg}`)
+          .join(', ');
+        toast.error(errorMsg);
+      } else if (error.response?.data?.error?.message) {
+        // Generic error message
+        toast.error(error.response.data.error.message);
+      } else if (error.message === 'Network Error') {
+        toast.error('Network error. Check your connection.');
+      } else {
+        toast.error('Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -299,19 +326,17 @@ export default function RegisterPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Role
                     </label>
-                    <div className="relative">
-                      <select
-                        name="role"
-                        value={formData.role}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
-                        required
-                      >
-                        <option value="employee">Employee</option>
-                        <option value="manager">Manager</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </div>
+                    <select
+                      name="role"
+                      value={formData.role}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
+                      required
+                    >
+                      <option value="employee">Employee</option>
+                      <option value="manager">Manager</option>
+                      <option value="admin">Admin</option>
+                    </select>
                   </motion.div>
                 </div>
 
@@ -415,4 +440,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
 
