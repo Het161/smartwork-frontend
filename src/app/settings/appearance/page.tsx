@@ -33,7 +33,7 @@ const themes = [
   {
     id: 'purple-dream' as Theme,
     name: 'Purple Dream',
-    colors: ['#7c3aed', #a855f7,#ec4899'],
+    colors: ['#7c3aed', '#a855f7','#ec4899'],
     bgClass: 'bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500'
   },
 ];
