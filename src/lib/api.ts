@@ -160,9 +160,25 @@ export const tasksAPI = {
 };
 
 // Analytics API endpoints
+// export const analyticsAPI = {
+//   getAdminDashboard: () => api.get('/api/v1/dashboard/admin'),
+// };
+
+// src/lib/api.ts - Add analytics API
+
 export const analyticsAPI = {
-  getAdminDashboard: () => api.get('/api/v1/dashboard/admin'),
+  getAdminDashboard: async () => {
+    const token = localStorage.getItem('access_token');
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${baseURL}/api/v1/analytics/admin`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.json();
+  }
 };
+
 
 // Notifications API endpoints
 export const notificationsAPI = {

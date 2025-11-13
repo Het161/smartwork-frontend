@@ -10,6 +10,13 @@ import {
   Building2, 
   BarChart3,
   Settings,
+  Calendar,
+  Clock,
+  FileText,
+  Bell,
+  Activity,
+  UserCircle,
+  HelpCircle,
   LogOut,
   Menu,
   X
@@ -24,13 +31,21 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // ✅ ALL 13 MENU ITEMS NOW INCLUDED
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Users, label: 'Users', path: '/admin/users' },
     { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
+    { icon: Calendar, label: 'Calendar', path: '/calendar' },
+    { icon: Clock, label: 'Time Tracker', path: '/timetracker' },
     { icon: Building2, label: 'Departments', path: '/departments' },
+    { icon: UserCircle, label: 'Team', path: '/team' },
     { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
+    { icon: FileText, label: 'Reports', path: '/reports' },
+    { icon: Activity, label: 'Activity', path: '/activity' },
+    { icon: Bell, label: 'Notifications', path: '/notifications' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
+    { icon: HelpCircle, label: 'Support', path: '/support' },
   ];
 
   const handleLogout = () => {
@@ -52,13 +67,13 @@ export default function DashboardLayout({
             className="w-64 bg-white shadow-xl flex flex-col"
           >
             {/* Logo */}
-            <div className="p-6 border-b border-gray-100">
+            <div className="p-6 border-b border-gray-100 flex-shrink-0">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 SmartWork 360
               </h2>
             </div>
 
-            {/* Menu Items */}
+            {/* Menu Items - NOW SCROLLABLE */}
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
               {menuItems.map((item) => {
                 const isActive = pathname === item.path;
@@ -74,7 +89,7 @@ export default function DashboardLayout({
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
                     <span className="font-medium">{item.label}</span>
                   </motion.button>
                 );
@@ -82,7 +97,7 @@ export default function DashboardLayout({
             </nav>
 
             {/* Logout Button */}
-            <div className="p-4 border-t border-gray-100">
+            <div className="p-4 border-t border-gray-100 flex-shrink-0">
               <motion.button
                 onClick={handleLogout}
                 whileHover={{ scale: 1.02 }}
@@ -128,3 +143,4 @@ export default function DashboardLayout({
     </div>
   );
 }
+

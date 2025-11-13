@@ -1,13 +1,102 @@
+/* src/app/globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Light Theme (Default) */
+:root,
+.theme-light {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --gradient-from: #3b82f6;
+  --gradient-to: #8b5cf6;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+/* Dark Theme */
+.theme-dark {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d3748;
+  --bg-card: #2d3748;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e0;
+  --border-color: #4a5568;
+  --gradient-from: #4299e1;
+  --gradient-to: #9f7aea;
 }
+
+/* Ocean Blue Theme */
+.theme-ocean-blue {
+  --bg-primary: #e0f2fe;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #0c4a6e;
+  --text-secondary: #0369a1;
+  --border-color: #bae6fd;
+  --gradient-from: #0284c7;
+  --gradient-to: #06b6d4;
+}
+
+/* Purple Dream Theme */
+.theme-purple-dream {
+  --bg-primary: #fae8ff;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #581c87;
+  --text-secondary: #7c3aed;
+  --border-color: #e9d5ff;
+  --gradient-from: #7c3aed;
+  --gradient-to: #ec4899;
+}
+
+/* Apply theme variables */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer base {
+  /* All input fields */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  textarea,
+  select {
+    @apply text-gray-900 !important;
+    color: #111827 !important; /* Force dark text */
+  }
+
+  /* Placeholder text */
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-400 !important;
+    color: #9CA3AF !important; /* Force gray placeholder */
+  }
+
+  /* Select options */
+  select option {
+    @apply text-gray-900 !important;
+    color: #111827 !important;
+  }
+
+  /* Disabled inputs */
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    @apply text-gray-500 !important;
+    color: #6B7280 !important;
+  }
+}
+

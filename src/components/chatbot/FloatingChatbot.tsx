@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
-import { chatbotAPI } from '@/lib/api';
+import chatbotAPI from '@/lib/api';
 
 interface Message {
   id: number;

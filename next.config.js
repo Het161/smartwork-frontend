@@ -4,7 +4,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+  output: 'export', // enables static export
+  images: {
+    unoptimized: true, // needed for next/image to work in static mode
+  },
   // Disable ESLint during build
   // eslint: {
   //   ignoreDuringBuilds: true,

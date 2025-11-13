@@ -46,8 +46,8 @@ export default function RegisterPage() {
       toast.error('Password is required');
       return;
     }
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters');
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
       return;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -62,46 +62,37 @@ export default function RegisterPage() {
       
       // ✅ FIXED: Send correct payload to backend
       const response = await authAPI.register({
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
-        full_name: formData.name,  // ✅ Maps 'name' to 'full_name'
+        full_name: formData.name.trim(),
         role: formData.role,
-        department: formData.department || undefined,
+        department: formData.department.trim() || undefined,
       });
       
       console.log('✅ Registration successful:', response.data);
       
-      // ✅ FIXED: Save token and user to localStorage
-      const { access_token, user } = response.data;
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('user', JSON.stringify(user));
+      toast.success('Registration successful! Redirecting to login...');
       
-      toast.success('Registration successful! Redirecting...');
-      
-      // Redirect to dashboard after 1 second
+      // Redirect to login after 1.5 seconds
       setTimeout(() => {
-        router.push('/dashboard/admin');
-      }, 1000);
+        router.push('/login');
+      }, 1500);
       
     } catch (error: any) {
       console.error('❌ Registration error:', error);
       
       // ✅ FIXED: Better error handling
-      if (error.response?.data?.detail) {
-        // Single error message
+      if (error.response?.status === 400) {
+        const detail = error.response?.data?.detail;
+        if (detail === "Email already registered") {
+          toast.error('This email is already registered. Please login.');
+        } else {
+          toast.error(detail || 'Registration failed');
+        }
+      } else if (error.response?.data?.detail) {
         toast.error(error.response.data.detail);
-      } else if (error.response?.data?.error?.details) {
-        // Validation errors
-        const details = error.response.data.error.details;
-        const errorMsg = details
-          .map((d: any) => `${d.loc.join('.')}: ${d.msg}`)
-          .join(', ');
-        toast.error(errorMsg);
-      } else if (error.response?.data?.error?.message) {
-        // Generic error message
-        toast.error(error.response.data.error.message);
       } else if (error.message === 'Network Error') {
-        toast.error('Network error. Check your connection.');
+        toast.error('Network error. Please check your connection and backend server.');
       } else {
         toast.error('Registration failed. Please try again.');
       }
@@ -187,7 +178,7 @@ export default function RegisterPage() {
               "🚀 Real-time productivity tracking",
               "🤖 AI assistant for daily tasks",
               "📊 Advanced analytics dashboard",
-              "🔒 Blockchain-secured audit trails"
+              "🔒 Secure audit trails"
             ].map((feature, index) => (
               <motion.div
                 key={index}
@@ -309,11 +300,11 @@ export default function RegisterPage() {
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
                     >
                       <option value="">Select</option>
-                      <option value="sales">Sales</option>
-                      <option value="marketing">Marketing</option>
-                      <option value="hr">HR</option>
-                      <option value="it">IT</option>
-                      <option value="finance">Finance</option>
+                      <option value="Sales">Sales</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="HR">HR</option>
+                      <option value="IT">IT</option>
+                      <option value="Finance">Finance</option>
                     </select>
                   </motion.div>
 
@@ -440,5 +431,6 @@ export default function RegisterPage() {
     </div>
   );
 }
+
 
 
