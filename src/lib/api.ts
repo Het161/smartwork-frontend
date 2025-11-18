@@ -169,7 +169,7 @@ export const tasksAPI = {
 export const analyticsAPI = {
   getAdminDashboard: async () => {
     const token = localStorage.getItem('access_token');
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://sih-backend-xiz8.onrender.com';
     const response = await fetch(`${baseURL}/api/v1/analytics/admin`, {
       headers: {
         'Authorization': `Bearer ${token}`
