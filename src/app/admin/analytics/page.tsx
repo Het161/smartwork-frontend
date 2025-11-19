@@ -58,8 +58,8 @@ export default function AnalyticsPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('access_token');
-      
-      const response = await fetch('http://localhost:8000/api/v1/analytics/admin', {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sih-backend-xiz8.onrender.com';
+      const response = await fetch(`${API_URL}/api/v1/analytics/admin`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 

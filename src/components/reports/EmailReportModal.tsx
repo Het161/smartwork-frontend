@@ -199,7 +199,8 @@ export function EmailReportModal({ isOpen, onClose }: EmailReportModalProps) {
     toast.loading('Sending email...', { id: 'email' });
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/reports/email', {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sih-backend-xiz8.onrender.com';
+      const response = await fetch(`${API_URL}/api/v1/reports/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
