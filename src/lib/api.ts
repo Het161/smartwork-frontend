@@ -90,7 +90,7 @@ export const authAPI = {
     email: string;
     password: string;
     full_name: string;
-    role: string;
+    // role: string;
     department?: string;
   }) => api.post('/api/v1/auth/register', data),
   
