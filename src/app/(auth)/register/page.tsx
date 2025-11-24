@@ -18,8 +18,8 @@
 //     email: '',
 //     password: '',
 //     confirmPassword: '',
-//     role: 'employee', // ✅ FIXED: Changed from 'user' to 'employee'
 //     department: '',
+//     role: 'user',
 //   });
 //   const [loading, setLoading] = useState(false);
 
@@ -64,16 +64,20 @@
 //     try {
 //       console.log('📤 Sending registration request...');
       
-//       // ✅ Send correct payload to backend
-//       const response = await authAPI.register({
+//       // ✅ FIXED: Only send fields backend expects (no role)
+//       const payload = {
 //         email: formData.email.trim(),
 //         password: formData.password,
 //         full_name: formData.full_name.trim(),
-//         role: formData.role, // Already lowercase from dropdown
 //         department: formData.department.trim(),
-//       });
+//         role: formData.role,
+//       };
       
-//       console.log('✅ Registration successful:', response.data);
+//       console.log('📦 Payload:', JSON.stringify(payload, null, 2));
+      
+//       const response = await authAPI.register(payload);
+      
+//       console.log('✅ Registration successful:', response);
       
 //       toast.success('Registration successful! Redirecting to login...');
       
@@ -84,9 +88,24 @@
       
 //     } catch (error: any) {
 //       console.error('❌ Registration error:', error);
+//       console.error('❌ Error response:', error.response?.data);
       
-//       // ✅ Better error handling
-//       if (error.response?.status === 400) {
+//       // ✅ Enhanced error handling
+//       if (error.response?.status === 422) {
+//         // Validation error - show detailed info
+//         const detail = error.response?.data?.detail;
+//         console.error('Validation errors:', detail);
+        
+//         if (Array.isArray(detail)) {
+//           // Pydantic validation errors
+//           const errorMessages = detail.map((err: any) => 
+//             `${err.loc?.join('.')}: ${err.msg}`
+//           ).join(', ');
+//           toast.error(`Validation error: ${errorMessages}`);
+//         } else {
+//           toast.error('Please check all fields are filled correctly');
+//         }
+//       } else if (error.response?.status === 400) {
 //         const detail = error.response?.data?.detail;
 //         if (detail === "Email already registered") {
 //           toast.error('This email is already registered. Please login.');
@@ -96,7 +115,7 @@
 //       } else if (error.response?.data?.detail) {
 //         toast.error(error.response.data.detail);
 //       } else if (error.message === 'Network Error') {
-//         toast.error('Network error. Please check your connection and backend server.');
+//         toast.error('Network error. Please check your connection.');
 //       } else {
 //         toast.error('Registration failed. Please try again.');
 //       }
@@ -287,62 +306,37 @@
 //                   </div>
 //                 </motion.div>
 
-//                 {/* Department and Role Row */}
-//                 <div className="grid grid-cols-2 gap-4">
-//                   {/* Department */}
-//                   <motion.div
-//                     initial={{ opacity: 0, x: -20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     transition={{ delay: 0.6 }}
+//                 {/* Department - Full Width */}
+//                 <motion.div
+//                   initial={{ opacity: 0, x: -20 }}
+//                   animate={{ opacity: 1, x: 0 }}
+//                   transition={{ delay: 0.6 }}
+//                 >
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Department
+//                   </label>
+//                   <select
+//                     name="department"
+//                     value={formData.department}
+//                     onChange={handleInputChange}
+//                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
+//                     required
 //                   >
-//                     <label className="block text-sm font-medium text-gray-700 mb-2">
-//                       Department
-//                     </label>
-//                     <select
-//                       name="department"
-//                       value={formData.department}
-//                       onChange={handleInputChange}
-//                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
-//                       required
-//                     >
-//                       <option value="">Select</option>
-//                       <option value="Sales">Sales</option>
-//                       <option value="Marketing">Marketing</option>
-//                       <option value="HR">HR</option>
-//                       <option value="IT">IT</option>
-//                       <option value="Finance">Finance</option>
-//                       <option value="Operations">Operations</option>
-//                     </select>
-//                   </motion.div>
-
-//                   {/* Role */}
-//                   <motion.div
-//                     initial={{ opacity: 0, x: -20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     transition={{ delay: 0.7 }}
-//                   >
-//                     <label className="block text-sm font-medium text-gray-700 mb-2">
-//                       Role
-//                     </label>
-//                     <select
-//                       name="role"
-//                       value={formData.role}
-//                       onChange={handleInputChange}
-//                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
-//                       required
-//                     >
-//                       <option value="employee">Employee</option>
-//                       <option value="manager">Manager</option>
-//                       <option value="admin">Admin</option>
-//                     </select>
-//                   </motion.div>
-//                 </div>
+//                     <option value="">Select Department</option>
+//                     <option value="Sales">Sales</option>
+//                     <option value="Marketing">Marketing</option>
+//                     <option value="HR">HR</option>
+//                     <option value="IT">IT</option>
+//                     <option value="Finance">Finance</option>
+//                     <option value="Operations">Operations</option>
+//                   </select>
+//                 </motion.div>
 
 //                 {/* Password */}
 //                 <motion.div
 //                   initial={{ opacity: 0, x: -20 }}
 //                   animate={{ opacity: 1, x: 0 }}
-//                   transition={{ delay: 0.8 }}
+//                   transition={{ delay: 0.7 }}
 //                 >
 //                   <label className="block text-sm font-medium text-gray-700 mb-2">
 //                     Password
@@ -373,7 +367,7 @@
 //                 <motion.div
 //                   initial={{ opacity: 0, x: -20 }}
 //                   animate={{ opacity: 1, x: 0 }}
-//                   transition={{ delay: 0.9 }}
+//                   transition={{ delay: 0.8 }}
 //                 >
 //                   <label className="block text-sm font-medium text-gray-700 mb-2">
 //                     Confirm Password
@@ -404,7 +398,7 @@
 //                 <motion.div
 //                   initial={{ opacity: 0, y: 20 }}
 //                   animate={{ opacity: 1, y: 0 }}
-//                   transition={{ delay: 1.0 }}
+//                   transition={{ delay: 0.9 }}
 //                   className="pt-4"
 //                 >
 //                   <AnimatedButton
@@ -421,7 +415,7 @@
 //                 <motion.p
 //                   initial={{ opacity: 0 }}
 //                   animate={{ opacity: 1 }}
-//                   transition={{ delay: 1.1 }}
+//                   transition={{ delay: 1.0 }}
 //                   className="text-center text-sm text-gray-600"
 //                 >
 //                   Already have an account?{' '}
@@ -441,12 +435,11 @@
 //   );
 // }
 
-
 "use client";
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, User, Building2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, User, Building2, Eye, EyeOff, Briefcase } from 'lucide-react';
 import { AnimatedButton } from '@/components/animations/AnimatedButton';
 import { authAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -463,7 +456,7 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: '',
     department: '',
-    role: 'user',
+    role: 'employee', // ✅ FIXED: Changed from 'user' to 'employee'
   });
   const [loading, setLoading] = useState(false);
 
@@ -508,13 +501,12 @@ export default function RegisterPage() {
     try {
       console.log('📤 Sending registration request...');
       
-      // ✅ FIXED: Only send fields backend expects (no role)
       const payload = {
         email: formData.email.trim(),
         password: formData.password,
         full_name: formData.full_name.trim(),
         department: formData.department.trim(),
-        role: formData.role,
+        role: formData.role, // ✅ Includes role in payload
       };
       
       console.log('📦 Payload:', JSON.stringify(payload, null, 2));
@@ -525,7 +517,6 @@ export default function RegisterPage() {
       
       toast.success('Registration successful! Redirecting to login...');
       
-      // Redirect to login after 1.5 seconds
       setTimeout(() => {
         router.push('/login');
       }, 1500);
@@ -534,14 +525,11 @@ export default function RegisterPage() {
       console.error('❌ Registration error:', error);
       console.error('❌ Error response:', error.response?.data);
       
-      // ✅ Enhanced error handling
       if (error.response?.status === 422) {
-        // Validation error - show detailed info
         const detail = error.response?.data?.detail;
         console.error('Validation errors:', detail);
         
         if (Array.isArray(detail)) {
-          // Pydantic validation errors
           const errorMessages = detail.map((err: any) => 
             `${err.loc?.join('.')}: ${err.msg}`
           ).join(', ');
@@ -556,6 +544,8 @@ export default function RegisterPage() {
         } else {
           toast.error(detail || 'Registration failed. Please check your input.');
         }
+      } else if (error.response?.status === 500) {
+        toast.error('Server error. Please try again or contact support.');
       } else if (error.response?.data?.detail) {
         toast.error(error.response.data.detail);
       } else if (error.message === 'Network Error') {
@@ -750,37 +740,65 @@ export default function RegisterPage() {
                   </div>
                 </motion.div>
 
-                {/* Department - Full Width */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Department
-                  </label>
-                  <select
-                    name="department"
-                    value={formData.department}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
-                    required
+                {/* Department and Role - Two Columns */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Department */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
                   >
-                    <option value="">Select Department</option>
-                    <option value="Sales">Sales</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="HR">HR</option>
-                    <option value="IT">IT</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Operations">Operations</option>
-                  </select>
-                </motion.div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Department
+                    </label>
+                    <select
+                      name="department"
+                      value={formData.department}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer"
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="Sales">Sales</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="HR">HR</option>
+                      <option value="IT">IT</option>
+                      <option value="Finance">Finance</option>
+                      <option value="Operations">Operations</option>
+                    </select>
+                  </motion.div>
+
+                  {/* ✅ ADDED: Role Dropdown */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Role
+                    </label>
+                    <div className="relative">
+                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
+                      <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleInputChange}
+                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white/50 cursor-pointer appearance-none"
+                        required
+                      >
+                        <option value="employee">Employee</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+                  </motion.div>
+                </div>
 
                 {/* Password */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 }}
+                  transition={{ delay: 0.8 }}
                 >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Password
@@ -811,7 +829,7 @@ export default function RegisterPage() {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
+                  transition={{ delay: 0.9 }}
                 >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Confirm Password
@@ -842,7 +860,7 @@ export default function RegisterPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
+                  transition={{ delay: 1.0 }}
                   className="pt-4"
                 >
                   <AnimatedButton
@@ -859,7 +877,7 @@ export default function RegisterPage() {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 1.0 }}
+                  transition={{ delay: 1.1 }}
                   className="text-center text-sm text-gray-600"
                 >
                   Already have an account?{' '}
