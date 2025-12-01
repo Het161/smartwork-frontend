@@ -27,8 +27,8 @@ export default function LoginPage() {
   // ✅ FIXED: Updated role mapping
   const dashboardRoutes: Record<string, string> = {
     admin: '/admin',
-    manager: '/dashboard',
-    employee: '/dashboard',
+    manager: '/manager',
+    employee: '/employee',
   };
 
   // Check if user is already logged in
