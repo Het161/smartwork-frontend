@@ -1,7 +1,7 @@
-
 /**
  * Authentication API Module
- * Handles all authentication-related API calls
+ * Handles all authentication-related API calls.
+ * Uses OAuth2 form-encoded data for login (matching backend).
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sih-backend-xiz8.onrender.com';
@@ -16,59 +16,61 @@ export interface RegisterData {
   password: string;
   full_name: string;
   department?: string;
+  role?: string;
+}
+
+export interface UserData {
+  id: number;
+  email: string;
+  full_name: string;
+  role: string;
+  department?: string;
+  is_active: boolean;
+  created_at?: string;
 }
 
 export interface AuthResponse {
-  success: boolean;
-  data: {
-    access_token: string;
-    token_type: string;
-    user: {
-      id: number;
-      email: string;
-      full_name: string;
-      role: string;
-      department?: string;
-      is_active: boolean;
-    };
-  };
-  error?: {
-    message: string;
-    status_code: number;
-  };
+  access_token: string;
+  token_type: string;
+  user: UserData;
 }
 
 /**
- * Login user
+ * Login user — sends form-encoded data (OAuth2PasswordRequestForm).
  */
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+  // Backend expects OAuth2 form data, NOT JSON
+  const formData = new URLSearchParams();
+  formData.append('username', credentials.email);
+  formData.append('password', credentials.password);
+
   const response = await fetch(`${API_URL}/api/v1/auth/login`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: JSON.stringify(credentials),
+    body: formData.toString(),
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error?.message || 'Login failed');
+    throw new Error(data.detail || data.error?.message || 'Login failed');
   }
 
-  // Store token in localStorage
-  if (data.success && data.data.access_token) {
-    localStorage.setItem('access_token', data.data.access_token);
-    localStorage.setItem('user', JSON.stringify(data.data.user));
+  // Store token and user info
+  if (data.access_token) {
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
   }
 
   return data;
 };
 
 /**
- * Register new user
+ * Register new user — sends JSON.
  */
-export const register = async (userData: RegisterData): Promise<AuthResponse> => {
+export const register = async (userData: RegisterData): Promise<any> => {
   const response = await fetch(`${API_URL}/api/v1/auth/register`, {
     method: 'POST',
     headers: {
@@ -80,7 +82,7 @@ export const register = async (userData: RegisterData): Promise<AuthResponse> =>
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error?.message || 'Registration failed');
+    throw new Error(data.detail || data.error?.message || 'Registration failed');
   }
 
   return data;
@@ -98,12 +100,12 @@ export const logout = (): void => {
 /**
  * Get current user from localStorage
  */
-export const getCurrentUser = () => {
+export const getCurrentUser = (): UserData | null => {
   if (typeof window === 'undefined') return null;
-  
+
   const userStr = localStorage.getItem('user');
   if (!userStr) return null;
-  
+
   try {
     return JSON.parse(userStr);
   } catch {
@@ -127,18 +129,18 @@ export const isAuthenticated = (): boolean => {
 };
 
 /**
- * Get user profile
+ * Get user profile from backend
  */
 export const getUserProfile = async () => {
   const token = getAccessToken();
-  
+
   if (!token) {
     throw new Error('Not authenticated');
   }
 
   const response = await fetch(`${API_URL}/api/v1/auth/me`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
